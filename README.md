@@ -1,4 +1,0 @@
-electricalbanana
-================
-
-Python IRC Bot
