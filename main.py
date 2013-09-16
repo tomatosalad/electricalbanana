@@ -166,7 +166,8 @@ class BananaBot(irc.IRCClient):
 			self.joinChannel(channel)
 
 	def regNickServ(self):
-		self.privout('%s' % (self.idnick,), 'identify %s' % (self.idpass,))
+		if hasattr(self, 'idnick') and hasattr(self, 'idpass'):
+			self.privout('%s' % (self.idnick,), 'identify %s' % (self.idpass,))
 
 	def joined(self, channel): 			#this stuff gets called when joining a channel
 		log.logger.info('[I have joined %s]' % (channel,))
