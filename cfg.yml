@@ -1,6 +1,13 @@
 ---
-nick: electricalbanana
-network: irc.foonetic.net
+nick: "electricalbanana"
+network: "irc.foonetic.net"
 port: 6667
-mainchannel: xkcd-ksp
-logchannel: xkcd-ksp
+mainchannel: "#xkcd-ksp"
+logchannel: "#xkcd-ksp"
+fullname: "Mellow Yellow"
+username: "tomatosalad"
+serverpassword: 
+nickservname: "NickServ"
+logfile: "bananabot.log"
+chatlogfile: "bananachat.log"
+ssl: "false"
