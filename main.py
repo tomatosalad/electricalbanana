@@ -339,7 +339,7 @@ def unicodeIn(msg):
 	return decMsg
 
 def run():
-	channel = mainc
+	channel = mainc.split()
 	host = network
 
 	localport = None #these aren't needed at all but I'm keeping them for the future
