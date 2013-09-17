@@ -68,7 +68,7 @@ class BananaBot(irc.IRCClient):
 
 	def privout(self, user, msg):
 		msgOut = unicodeOut(msg)
-		userOut = unicodeOut(msg)
+		userOut = unicodeOut(user)
 		self.msg(user=userOut, message=msgOut)
 
 		log.chatlog.info('[PRV->%s]%s' % (userOut, stripcolors(msgOut)))
@@ -166,8 +166,9 @@ class BananaBot(irc.IRCClient):
 			self.joinChannel(channel)
 
 	def regNickServ(self):
-		if hasattr(self, 'idnick') and hasattr(self, 'idpass'):
-			self.privout('%s' % (self.idnick,), 'identify %s' % (self.idpass,))
+		self.privout('%s' % (self.idnick,), 'identify %s' % (self.idpass,))
+
+		log.logger.info("Identified with NickServ.")
 
 	def joined(self, channel): 			#this stuff gets called when joining a channel
 		log.logger.info('[I have joined %s]' % (channel,))
