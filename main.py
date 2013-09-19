@@ -22,6 +22,7 @@ from twisted.words.protocols import irc
 from twisted.python import log
 from twisted.internet import reactor, protocol
 import time, sys
+import re
 
 import log
 
@@ -212,6 +213,26 @@ class BananaBot(irc.IRCClient):
 				log.chatlog.info('[PRV<-]<%s> <%s>' % (userIn, msgIn))
 		else:
 			log.chatlog.info('[PUB<-]<%s> %s' % (user, msg))
+
+		if re.match('%s[:,] hello' % nick, msgIn, re.IGNORECASE):
+			self.pubout(channelIn, "Hello!")
+
+		if re.match('botsnack', msgIn, re.IGNORECASE):
+			self.pubout(channelIn, ":D")
+
+		#if re.search('/github://')
+
+		if re.match('%s[:,] stats' % nick, msgIn, re.IGNORECASE):
+			self.pubout(channelIn, ("I am %s, a bot based on the project %s and I am version %s. "+
+			"My creator is tomatosalad and you can bug him at http://tomatosalad.net. You should "+
+			"bug him to add more stuff to this, or code it in yourself (ask me for my source).")
+			% (nick, versionname, versionnumber))
+
+		if re.match('%s[:,] source' % nick, msgIn, re.IGNORECASE):
+			self.pubout(channelIn, ("My source is available at https://github.com/tomatosalad/ele")
+			+ ("ctricalbanana"))
+
+
 
 	def action(self, user, channel, message):
 		user = user.split('!', 1)[0]
