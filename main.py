@@ -220,7 +220,10 @@ class BananaBot(irc.IRCClient):
 		if re.match('botsnack', msgIn, re.IGNORECASE):
 			self.pubout(channelIn, ":D")
 
-		#if re.search('/github://')
+		if re.search('github://([\S]+)', msgIn, re.IGNORECASE):
+			m = re.search('github://([\S]+)', msgIn, re.IGNORECASE) #this is a really stupid way of
+			link = m.group(1)										#doing this, but it looks
+			self.pubout(channelIn, "http://github.com/%s" % link)	#better than the alternative
 
 		if re.match('%s[:,] stats' % nick, msgIn, re.IGNORECASE):
 			self.pubout(channelIn, ("I am %s, a bot based on the project %s and I am version %s. "+
