@@ -23,6 +23,7 @@ from twisted.python import log
 from twisted.internet import reactor, protocol
 import time, sys
 import re
+import random
 
 import log
 
@@ -46,7 +47,7 @@ sslpref = config["ssl"]
 #	fname = "Mellow Yellow"
 
 versionname = "Electrical Banana"
-versionnumber = "0.1.0"
+versionnumber = "0.2.0"
 
 
 """Add these back in if you don't want to use quotes in cfg.yml
@@ -212,7 +213,7 @@ class BananaBot(irc.IRCClient):
 			else:
 				log.chatlog.info('[PRV<-]<%s> <%s>' % (userIn, msgIn))
 		else:
-			log.chatlog.info('[PUB<-]<%s> %s' % (user, msg))
+			log.chatlog.info('[PUB<-]<%s> %s' % (userIn, msgIn))
 
 		if re.match('%s[:,] hello' % nick, msgIn, re.IGNORECASE):
 			self.pubout(channelIn, "Hello!")
@@ -231,18 +232,78 @@ class BananaBot(irc.IRCClient):
 			"bug him to add more stuff to this, or code it in yourself (ask me for my source).")
 			% (nick, versionname, versionnumber))
 
+		if re.search('wiki://([\S]+)', msgIn, re.IGNORECASE):
+			m = re.search('wiki://([\S]+)', msgIn, re.IGNORECASE)
+			link = m.group(1)
+			self.pubout(channelIn, "http://en.wikipedia.org/wiki/%s" % link)
+
+		if re.search('google://([\S]+)', msgIn, re.IGNORECASE):
+			m = re.search('google://([\S]+)', msgIn, re.IGNORECASE)
+			link = m.group(1)
+			self.pubout(channelIn, "http://google.com/?q=%s" % link)
+
+		if re.search('xkcd://([\S]+)', msgIn, re.IGNORECASE):
+			m = re.search('xkcd://([\S]+)', msgIn, re.IGNORECASE)
+			link = m.group(1)
+			self.pubout(channelIn, "http://xkcd.com/%s" % link)
+
+		if re.search('trope://([\S]+)', msgIn, re.IGNORECASE):
+			m = re.search('trope://([\S]+)', msgIn, re.IGNORECASE)
+			link = m.group(1)
+			self.pubout(channelIn, "http://tvtropes.org/pmwiki/pmwiki.php/Main/%s" % link)
+
+		if re.search('qc://([\S]+)', msgIn, re.IGNORECASE):
+			m = re.search('qc://([\S]+)', msgIn, re.IGNORECASE)
+			link = m.group(1)
+			self.pubout(channelIn, "http://questionablecontent.net/view.php?comic=%s" % link)
+
+		if re.search('ksp://([\S]+)', msgIn, re.IGNORECASE):
+			m = re.search('ksp://([\S]+)', msgIn, re.IGNORECASE)
+			link = m.group(1)
+			self.pubout(channelIn, "http://wiki.kerbalspaceprogram.com/wiki/%s" % link)
+
 		if re.match('%s[:,] source' % nick, msgIn, re.IGNORECASE):
 			self.pubout(channelIn, ("My source is available at https://github.com/tomatosalad/ele")
 			+ ("ctricalbanana"))
 
+		"""pytz is silly, figure this out for real later
+		if re.search('time in [a-zA-Z]$', msgIn, re.IGNORECASE):
+			m = re.search('time in ([a-zA-Z])$', msgIn, re.IGNORECASE)
+			tz = m.group(1)
+			if tz == PST:
+		"""
 
 
-	def action(self, user, channel, message):
+	def action(self, user, channel, msg):
 		user = user.split('!', 1)[0]
 		userIn = unicodeIn(user)
 		channelIn = unicodeIn(channel)
 		msgIn = unicodeIn(msg)
-		log.chatlog.info('* %s %s' % (user, msg))
+		log.chatlog.info('* %s %s' % (userIn, msgIn))
+
+		if re.match('flips a coin$', msgIn, re.IGNORECASE):
+			coin = random.randint(1,2)
+			if coin == 1:
+				self.pubout(channelIn, "%s got: heads" % userIn)
+			else:
+				self.pubout(channelIn, "%s got: tails" % userIn)
+
+		"""Fix This Later
+		if re.match('rolls ([1-9])d([1-9][0-9]{0,2})', msgIn, re.IGNORECASE):
+			m = re.match('rolls ([1-9])d([1-9][0-9]{0,2})', msgIn, re.IGNORECASE)
+			dice = m.group(1)
+			sides = m.group(2)
+			int(dice)
+			int(sides)
+			for x in range(1, dice):
+				x = random.randint(1, sides)
+				total.append(x)
+
+			totalout = ', '.join(total)
+			total = sum(total)
+
+			self.pubout("%s got %s" % (userIn, totalout))
+			"""
 
 	def topicUpdated(self, user, channel, newTopic):
 		user = user.split('!', 1)[0]
