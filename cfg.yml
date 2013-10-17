@@ -2,8 +2,8 @@
 nick: "electricalbanana"
 network: "irc.foonetic.net"
 port: 6667
-mainchannel: "#xkcd-ksp"	#this should technically support more than one channel. try it for yourself!
-logchannel: "#xkcd-ksp"		#this doesn't actually do anything yet
+mainchannel: "#xkcd-ksp"
+logchannel: "#xkcd-ksp"
 fullname: "Mellow Yellow"
 username: "tomatosalad"
 serverpassword: 
