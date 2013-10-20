@@ -38,9 +38,6 @@ and password for electricalbanana to work properly.
 It is recommended that you run electricalbanana in a GNU Screen. Kill it with a simple `^C` (a more elegant solution is being
 devised for the future).
 
-Known Issues
-------------
-* Logging is horribly broken.
 
 Planned Features
 ----------------
