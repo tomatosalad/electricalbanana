@@ -36,3 +36,6 @@ logger.setLevel(logging.INFO)
 
 chatlog = logging.getLogger('chat')
 chatlog.setLevel(logging.INFO)
+
+scroll = logging.getLogger('scrollback')
+scroll.setLevel(logging.INFO)

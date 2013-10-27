@@ -10,4 +10,6 @@ serverpassword:
 nickservname: "NickServ"
 logfile: "bananabot.log"
 chatlogfile: "bananachat.log"
+scrollbackfile: "scrollback.log"
 ssl: "false"
+rejoinifkicked: "yes"

@@ -41,13 +41,15 @@ passwd = config["serverpassword"]
 nsname = config["nickservname"]
 logfile = config["logfile"]
 chatfile = config["chatlogfile"]
+scrollfile = config["scrollbackfile"]
 sslpref = config["ssl"]
+rejoin = config["rejoinifkicked"]
 
 #if fname == None:
 #	fname = "Mellow Yellow"
 
 versionname = "Electrical Banana"
-versionnumber = "0.2.0"
+versionnumber = "0.2.1"
 
 
 """Add these back in if you don't want to use quotes in cfg.yml
@@ -66,7 +68,8 @@ class BananaBot(irc.IRCClient):
 		self.say(channel=channelOut, message=msgOut)
 
 		#strip color codes
-		log.chatlog.info('[PUB->%s]%s') % (channelOut, stripcolors(msgOut))
+		log.chatlog.info('[PUB->%s]%s' % (channelOut, stripcolors(msgOut)))
+		log.scroll.info('<%s> %s' % (nick, stripcolors(msgOut)))
 
 	def privout(self, user, msg):
 		msgOut = unicodeOut(msg)
@@ -154,7 +157,7 @@ class BananaBot(irc.IRCClient):
 
 	def connectionLost(self, reason):
 		irc.IRCClient.connectionLost(self, reason)
-		log.logger.info("[Disconnected at %s:%s" % (time.asctime(time.localtime(time.time())), reason))
+		log.logger.info("[Disconnected at %s:%s]" % (time.asctime(time.localtime(time.time())), reason))
 
 	#event callbacks
 
@@ -183,8 +186,11 @@ class BananaBot(irc.IRCClient):
 			self.channels.remove(channel)
 
 	def kickedFrom(self, channel, kicker, message):
-		if channel in self.channels:
-			self.channels.remove(channel)
+		if rejoin == "yes":
+			self.joinChannel(channel)
+		else:
+			if channel in self.channels:
+				self.channels.remove(channel)
 
 		channelIn = unicodeIn(channel)
 		kickerIn = unicodeIn(kicker)
@@ -214,9 +220,11 @@ class BananaBot(irc.IRCClient):
 				log.chatlog.info('[PRV<-]<%s> <%s>' % (userIn, msgIn))
 		else:
 			log.chatlog.info('[PUB<-]<%s> %s' % (userIn, msgIn))
+			log.scroll.info('<%s> %s' % (userIn, msgIn))
 
 		if re.match('%s[:,] hello' % nick, msgIn, re.IGNORECASE):
 			self.pubout(channelIn, "Hello!")
+			log.logger.info("Saying hello to %s in %s" % (userIn, channelIn))
 
 		if re.match('botsnack', msgIn, re.IGNORECASE):
 			self.pubout(channelIn, ":D")
@@ -225,6 +233,7 @@ class BananaBot(irc.IRCClient):
 			m = re.search('github://([\S]+)', msgIn, re.IGNORECASE) #this is a really stupid way of
 			link = m.group(1)										#doing this, but it looks
 			self.pubout(channelIn, "http://github.com/%s" % link)	#better than the alternative
+			log.logger.info("Creating a link for %s in %s" % (userIn, channelIn))
 
 		if re.match('%s[:,] stats' % nick, msgIn, re.IGNORECASE):
 			self.pubout(channelIn, ("I am %s, a bot based on the project %s and I am version %s. "+
@@ -236,35 +245,42 @@ class BananaBot(irc.IRCClient):
 			m = re.search('wiki://([\S]+)', msgIn, re.IGNORECASE)
 			link = m.group(1)
 			self.pubout(channelIn, "http://en.wikipedia.org/wiki/%s" % link)
+			log.logger.info("Creating a link for %s in %s" % (userIn, channelIn))
 
 		if re.search('google://([\S]+)', msgIn, re.IGNORECASE):
 			m = re.search('google://([\S]+)', msgIn, re.IGNORECASE)
 			link = m.group(1)
 			self.pubout(channelIn, "http://google.com/?q=%s" % link)
+			log.logger.info("Creating a link for %s in %s" % (userIn, channelIn))
 
 		if re.search('xkcd://([\S]+)', msgIn, re.IGNORECASE):
 			m = re.search('xkcd://([\S]+)', msgIn, re.IGNORECASE)
 			link = m.group(1)
 			self.pubout(channelIn, "http://xkcd.com/%s" % link)
+			log.logger.info("Creating a link for %s in %s" % (userIn, channelIn))
 
 		if re.search('trope://([\S]+)', msgIn, re.IGNORECASE):
 			m = re.search('trope://([\S]+)', msgIn, re.IGNORECASE)
 			link = m.group(1)
 			self.pubout(channelIn, "http://tvtropes.org/pmwiki/pmwiki.php/Main/%s" % link)
+			log.logger.info("Creating a link for %s in %s" % (userIn, channelIn))
 
 		if re.search('qc://([\S]+)', msgIn, re.IGNORECASE):
 			m = re.search('qc://([\S]+)', msgIn, re.IGNORECASE)
 			link = m.group(1)
 			self.pubout(channelIn, "http://questionablecontent.net/view.php?comic=%s" % link)
+			log.logger.info("Creating a link for %s in %s" % (userIn, channelIn))
 
 		if re.search('ksp://([\S]+)', msgIn, re.IGNORECASE):
 			m = re.search('ksp://([\S]+)', msgIn, re.IGNORECASE)
 			link = m.group(1)
 			self.pubout(channelIn, "http://wiki.kerbalspaceprogram.com/wiki/%s" % link)
+			log.logger.info("Creating a link for %s in %s" % (userIn, channelIn))
 
 		if re.match('%s[:,] source' % nick, msgIn, re.IGNORECASE):
 			self.pubout(channelIn, ("My source is available at https://github.com/tomatosalad/ele")
 			+ ("ctricalbanana"))
+			log.logger.info("Giving the source to %s in %s" % (userIn, channelIn))
 
 		"""pytz is silly, figure this out for real later
 		if re.search('time in [a-zA-Z]$', msgIn, re.IGNORECASE):
@@ -280,13 +296,18 @@ class BananaBot(irc.IRCClient):
 		channelIn = unicodeIn(channel)
 		msgIn = unicodeIn(msg)
 		log.chatlog.info('* %s %s' % (userIn, msgIn))
+		log.scroll.info('* %s %s' % (userIn, msgIn))
 
 		if re.match('flips a coin$', msgIn, re.IGNORECASE):
 			coin = random.randint(1,2)
 			if coin == 1:
 				self.pubout(channelIn, "%s got: heads" % userIn)
+				cflip = "heads"
 			else:
 				self.pubout(channelIn, "%s got: tails" % userIn)
+				cflip = "tails"
+			log.logger.info("Flipping a coin for %s in %s, they got %s" % (userIn, channelIn, cflip))
+
 
 		"""Fix This Later
 		if re.match('rolls ([1-9])d([1-9][0-9]{0,2})', msgIn, re.IGNORECASE):
@@ -317,12 +338,14 @@ class BananaBot(irc.IRCClient):
 		userIn = unicodeIn(user)
 		channelIn = unicodeIn(channel)
 		log.chatlog.info('%s joined %s' % (user, channel))
+		log.scroll.info('%s joined %s' % (user, channel))
 
 	def userLeft(self, user, channel):
 		user = user.split('!', 1)[0]
 		userIn = unicodeIn(user)
 		channelIn = unicodeIn(channel)
 		log.chatlog.info('%s left %s' % (user, channel))
+		log.scroll.info('%s has left %s' % (user, channel))
 
 	def userKicked(self, user, channel, kicker, message):
 		user = user.split('!', 1)[0]
@@ -332,6 +355,7 @@ class BananaBot(irc.IRCClient):
 		messageIn = unicodeIn(message)
 
 		log.chatlog.info('%s was kicked from %s by %s: %s' % (user, channel, kicker, message))
+		log.scroll.info('%s was kicked from %s by %s: %s' % (user, channel, kicker, message))
 
 	def userQuit(self, user, quitMessage):
 		user = user.split('!', 1)[0]
@@ -339,11 +363,13 @@ class BananaBot(irc.IRCClient):
 		quitMsgIn = unicodeIn(quitMessage)
 
 		log.chatlog.info('%s has quit [%s]' % (user, quitMessage))
+		log.scroll.info('%s has quit [%s]' % (user, quitMessage))
 
 	def userRenamed(self, oldname, newname):
 		oldnameIn = unicodeIn(oldname)
 		newnameIn = unicodeIn(newname)
 		log.chatlog.info('%s is now known as %s' % (oldname, newname))
+		log.scroll.info('%s is now known as %s' % (oldname, newname))
 
 	def cprivmsg(self, channel, user, message):
 		msgOut = unicodeOut(msg)
@@ -358,6 +384,7 @@ class BananaBot(irc.IRCClient):
 		channelOut = unicodeOut(channel)
 		fmt = "CNOTICE %s %s:%%s" % (userOut, channelOut)
 		self.sendLine(fmt % (messageOut,))
+
 
 class BananaBotFactory(protocol.ClientFactory):
 	"""Factory for bots.
@@ -386,15 +413,27 @@ class BananaBotFactory(protocol.ClientFactory):
 
 		#chatlog stuff
 		try:
-			print "Opening Log File..."
+			print "Opening Chatlog File..."
 			log.addLogFileHandler(log.chatlog,chatfile,log.cformat)
 		except IOError, msg:
-			print "Unable to open log file: ", msg
+			print "Unable to open chatlog file: ", msg
 			print "Defaulting to local."
 			log.addLogFileHandler(log.chatlog,'bananachat.log',log.cformat)
 		except KeyError:
 			print "No log file config found, using default."
 			log.addLogFileHandler(log.chatlog,'bananachat.log',log.cformat)
+
+		#scrollback stuff
+		try:
+			print "Opening Scrollback File..."
+			log.addLogFileHandler(log.scroll,scrollfile,log.cformat)
+		except IOError, msg:
+			print "Unable to open scrollback file: ", msg
+			print "Defaulting to local."
+			log.addLogFileHandler(log.scroll,'scrollback.log',log.cformat)
+		except KeyError:
+			print "No log file config found, using default."
+			log.addLogFileHandler(log.scroll,'scrollback.log',log.cformat)
 
 	def clientConnectionLost(self, connector, reason):
 		connector.connect()
