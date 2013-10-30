@@ -49,7 +49,7 @@ rejoin = config["rejoinifkicked"]
 #	fname = "Mellow Yellow"
 
 versionname = "Electrical Banana"
-versionnumber = "0.2.1"
+versionnumber = "0.2.2"
 
 
 """Add these back in if you don't want to use quotes in cfg.yml
@@ -218,6 +218,7 @@ class BananaBot(irc.IRCClient):
 				log.chatlog.info('[PRV<-]<%s> <%s>' % (user, msgNoPwd))
 			else:
 				log.chatlog.info('[PRV<-]<%s> <%s>' % (userIn, msgIn))
+
 		else:
 			log.chatlog.info('[PUB<-]<%s> %s' % (userIn, msgIn))
 			log.scroll.info('<%s> %s' % (userIn, msgIn))
