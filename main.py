@@ -48,8 +48,8 @@ rejoin = config["rejoinifkicked"]
 #if fname == None:
 #	fname = "Mellow Yellow"
 
-versionname = "Electrical Banana"
-versionnumber = "0.2.2"
+projectname = "electricalbanana"
+versionnumber = "0.2.3"
 
 
 """Add these back in if you don't want to use quotes in cfg.yml
@@ -139,7 +139,7 @@ class BananaBot(irc.IRCClient):
 
 		self.lineRate = float(2)
 
-		self.versionName = versionname
+		self.projectname = projectname
 		self.versionNumber = versionnumber
 
 		self.whois = []
@@ -240,7 +240,7 @@ class BananaBot(irc.IRCClient):
 			self.pubout(channelIn, ("I am %s, a bot based on the project %s and I am version %s. "+
 			"My creator is tomatosalad and you can bug him at http://tomatosalad.net. You should "+
 			"bug him to add more stuff to this, or code it in yourself (ask me for my source).")
-			% (nick, versionname, versionnumber))
+			% (nick, projectname, versionnumber))
 
 		if re.search('wiki://([\S]+)', msgIn, re.IGNORECASE):
 			m = re.search('wiki://([\S]+)', msgIn, re.IGNORECASE)
